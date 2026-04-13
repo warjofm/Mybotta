@@ -3,17 +3,17 @@ FROM ubuntu:22.04
 RUN apt update && apt install -y \
   curl \
   ca-certificates \
-  nodejs \
-  npm
+  bash \
+  unzip \
+  tar \
+  xz-utils
 
-# install enowxai
-RUN curl -sSL https://enowxlabs.com/install.sh | bash
+# 🔥 install enowxai (yang bener)
+RUN curl -sSL https://api.enowxlabs.com/install/enowx-ai?mode=binary | bash
 
 ENV PATH="/root/.local/bin:$PATH"
 
 WORKDIR /app
 COPY . .
-
-RUN npm install
 
 CMD ["node", "server.js"]
