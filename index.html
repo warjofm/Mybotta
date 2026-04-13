@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>enowx terminal</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #0d1117;
+      color: #00ff9c;
+      font-family: monospace;
+    }
+
+    .terminal {
+      padding: 20px;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .line {
+      display: flex;
+      align-items: center;
+    }
+
+    .prompt {
+      margin-right: 8px;
+      color: #58a6ff;
+    }
+
+    input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #00ff9c;
+      width: 100%;
+      font-family: monospace;
+      font-size: 14px;
+    }
+
+    pre {
+      margin: 5px 0 10px;
+      white-space: pre-wrap;
+      color: #c9d1d9;
+    }
+  </style>
+</head>
+<body>
+
+<div class="terminal" id="terminal">
+  <div class="line">
+    <span class="prompt">$</span>
+    <input id="cmd" autofocus />
+  </div>
+</div>
+
+<script>
+const terminal = document.getElementById("terminal");
+const input = document.getElementById("cmd");
+
+let history = [];
+let index = -1;
+
+input.addEventListener("keydown", async (e) => {
+
+  // ENTER
+  if (e.key === "Enter") {
+    const cmd = input.value.trim();
+    if (!cmd) return;
+
+    history.push(cmd);
+    index = history.length;
+
+    addLine("$ " + cmd);
+
+    const res = await fetch("/run", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ cmd })
+    });
+
+    const text = await res.text();
+    addOutput(text);
+
+    input.value = "";
+    scrollBottom();
+  }
+
+  // UP HISTORY
+  if (e.key === "ArrowUp") {
+    if (index > 0) {
+      index--;
+      input.value = history[index];
+    }
+  }
+
+  // DOWN HISTORY
+  if (e.key === "ArrowDown") {
+    if (index < history.length - 1) {
+      index++;
+      input.value = history[index];
+    } else {
+      input.value = "";
+    }
+  }
+});
+
+function addLine(text) {
+  const div = document.createElement("div");
+  div.textContent = text;
+  terminal.appendChild(div);
+}
+
+function addOutput(text) {
+  const pre = document.createElement("pre");
+  pre.textContent = text;
+  terminal.appendChild(pre);
+}
+
+function scrollBottom() {
+  terminal.scrollTop = terminal.scrollHeight;
+}
+</script>
+
+</body>
+</html>
