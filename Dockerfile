@@ -6,9 +6,11 @@ RUN apt update && apt install -y \
   bash \
   unzip \
   tar \
-  xz-utils
+  xz-utils \
+  nodejs \
+  npm
 
-# 🔥 install enowxai (yang bener)
+# install enowxai (yang bener)
 RUN curl -sSL https://api.enowxlabs.com/install/enowx-ai?mode=binary | bash
 
 ENV PATH="/root/.local/bin:$PATH"
