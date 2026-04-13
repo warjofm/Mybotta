@@ -1,13 +1,19 @@
 FROM ubuntu:22.04
 
-RUN apt update && apt install -y curl ca-certificates
+RUN apt update && apt install -y \
+  curl \
+  ca-certificates \
+  nodejs \
+  npm
 
 # install enowxai
 RUN curl -sSL https://enowxlabs.com/install.sh | bash
 
 ENV PATH="/root/.local/bin:$PATH"
 
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
+WORKDIR /app
+COPY . .
 
-CMD ["/start.sh"]
+RUN npm install
+
+CMD ["node", "server.js"]
